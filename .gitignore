@@ -1,0 +1,7 @@
+*.o
+sha1
+a.out
+.DS_Store
+._*
+*.sw*
+test
