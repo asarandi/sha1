@@ -37,7 +37,7 @@ int main(int ac, char **av)
     hash = sha1(mem, st.st_size);
     munmap(mem, st.st_size);
     close(fd);
-    printf("SHA1 (%s) = %08x%08x%08x%08x%08x\n",
-        av[1], hash->h0, hash->h1, hash->h2, hash->h3, hash->h4);
+    printf("%08x%08x%08x%08x%08x  %s\n",
+        hash->h0, hash->h1, hash->h2, hash->h3, hash->h4, av[1]);
     return 0;
 }
