@@ -44,13 +44,15 @@ section .text
 .size_ok:   sub     rcx, 8
             xor     al, al
             rep     stosb
-            mov     rax, rbx
-            shl     rax, 3
+            shl     rbx, 3
+            mov     eax, ebx
             bswap   eax
-            mov     dword [rdi+4], eax
-            shr     rax, 32
+            mov     dword [rdi + 4], eax
+            shr     rbx, 32
+            mov     eax, ebx
             bswap   eax
             stosd
+
             pop     r9                          ; r9 = size - (size % 64)
             pop     rsi                         ; rsi = data
                                                 ; r15 = tail size (64 or 128)
