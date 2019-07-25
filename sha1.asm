@@ -20,7 +20,7 @@ section .text
             mov     rbx, rcx
             and     rcx, 63
             sub     rsi, rcx
-            
+
             push    rdi
             push    rsi
             push    rcx
@@ -46,12 +46,14 @@ section .text
             rep     stosb
             mov     rax, rbx
             shl     rax, 3
-            stosd
+            bswap   eax
+            mov     dword [rdi+4], eax
             shr     rax, 32
+            bswap   eax
             stosd
             pop     r9                          ; r9 = size - (size % 64)
             pop     rsi                         ; rsi = data
-                                                ; r15 = tail size (64 or 128)            
+                                                ; r15 = tail size (64 or 128)
             mov     r10, 0x67452301
             mov     r11, 0xefcdab89
             mov     r12, 0x98badcfe
@@ -73,13 +75,18 @@ section .text
             push    r13
             push    r14
 
-            mov     rcx, 64
-            sub     r9, rcx
-            lea     rdi, [rel buf]            
+            mov     rcx, 16
+            sub     r9, 64
+            lea     rdi, [rel buf]
             push    rdi
-            push    rcx
-            rep     movsb
-            pop     rcx
+
+.byteswap_copy:
+            lodsd
+            bswap   eax
+            stosd
+            loop    .byteswap_copy
+
+            mov     rcx, 64
 .extend:
             mov     eax, dword [rdi-12]
             xor     eax, dword [rdi-32]
@@ -136,7 +143,7 @@ section .text
             add     eax, dword [rdi + rcx*4]
             mov     r14, r13
             mov     r13, r12
-            mov     r12, r11            
+            mov     r12, r11
             rol     r12d, 30
             mov     r11, r10
             mov     r10, rax
@@ -169,15 +176,10 @@ section .text
 .done:
             lea     rax, [rel result]
 
-            bswap   r10d
             mov     dword [rax], r10d
-            bswap   r11d
             mov     dword [rax + 4], r11d
-            bswap   r12d
             mov     dword [rax + 8], r12d
-            bswap   r13d
             mov     dword [rax + 12], r13d
-            bswap   r14d
             mov     dword [rax + 16], r14d
 
             pop     r15
@@ -188,11 +190,8 @@ section .text
 
             ret
 
-
 section .data
 
 result      times 5 dd 0
-
 tail        times 128 db 0
-
 buf         times 320 db 0
